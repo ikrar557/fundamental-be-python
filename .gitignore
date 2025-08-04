@@ -1,0 +1,15 @@
+.env
+.idea
+movie_go/__pycache__
+movies/__pycache__
+movies/migrations/__pycache__
+studios/__pycache__
+studios/migrations/__pycache__
+seats/__pycache__
+seats/migrations/__pycache__
+showtimes/__pycache__
+showtimes/migrations/__pycache__
+reservations/__pycache__
+reservations/migrations/__pypycache__
+core/__pycache__
+core/migrations/__pycache__
