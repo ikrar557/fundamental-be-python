@@ -5,7 +5,6 @@ from payments.models import Payment
 from registrations.models import Registration
 from registrations.serializers import RegistrationSerializer
 
-
 class PaymentSerializer(serializers.HyperlinkedModelSerializer):
     _links = serializers.SerializerMethodField()
     registration = serializers.CharField(source='registration_id.id', read_only=True)
@@ -13,10 +12,14 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Registration.objects.all(),
         write_only=True
     )
+    amount_paid = serializers.SerializerMethodField()
 
     class Meta:
         model = Payment
         fields = ('id', 'payment_method', 'payment_status', 'amount_paid', 'registration', 'registration_id', '_links')
+
+    def get_amount_paid(self, obj):
+        return str(obj.amount_paid)
 
     def get__links(self, obj):
         request = self.context.get('request')
