@@ -44,7 +44,7 @@ class PaymentDetailView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [IsAuthenticated()]
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request, pk):

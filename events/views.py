@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from core.permissions import IsOwnerOrAdminOrSuperUser
+from core.permissions import IsAdminOrOrganizerOrSuperUser
 from events.models import Event
 from events.serializers import EventSerializer
 
@@ -14,7 +14,7 @@ class EventListCreateView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticated(), IsOwnerOrAdminOrSuperUser()]
+            return [IsAuthenticated(), IsAdminOrOrganizerOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request):
@@ -41,8 +41,8 @@ class EventDetailView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            return [IsAuthenticated()]
+        if self.request.method in ['PUT', 'DELETE']:
+            return [IsAuthenticated(), IsAdminOrOrganizerOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request, pk):

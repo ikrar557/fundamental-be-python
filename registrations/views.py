@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from core.permissions import IsOwnerOrAdminOrSuperUser
+from core.permissions import IsAdminOrSuperUser
 from registrations.models import Registration
 from registrations.serializers import RegistrationSerializer
 
@@ -16,11 +16,11 @@ class RegistrationListCreateView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticated(), IsOwnerOrAdminOrSuperUser()]
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request):
-        registrations = Registration.objects.all()
+        registrations = Registration.objects.all().order_by('id')[:10]
         serializer = RegistrationSerializer(registrations, many=True)
         return Response({'registrations': serializer.data})
 
@@ -43,8 +43,8 @@ class RegistrationDetailView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            return [IsAuthenticated()]
+        if self.request.method in ['PUT', 'DELETE']:
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request, pk):
