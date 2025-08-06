@@ -18,6 +18,7 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
         model = Payment
         fields = ('id', 'payment_method', 'payment_status', 'amount_paid', 'registration', 'registration_id', '_links')
 
+    # TODO: Remove the serializers to convert amount_paid if the collections postman fixed
     def get_amount_paid(self, obj):
         return str(obj.amount_paid)
 

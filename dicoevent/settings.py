@@ -130,6 +130,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_ROOT = BASE_DIR
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -147,3 +149,15 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
 }
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.InMemoryStorage",
+    },
+
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MAX_IMAGE_SIZE = 500 * 1024

@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "4be14325-11be-46ad-9015-79dd015e798a",
-		"name": "[788] DicoEvent versi 1",
+		"_postman_id": "b608a06b-6491-40ee-a3e7-1c484db495bc",
+		"name": "[788] DicoEvent versi 2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7447411"
 	},
@@ -2243,7 +2243,7 @@
 					"response": []
 				},
 				{
-					"name": "[Admin/Superuser] Get All Registrations Copy",
+					"name": "Get Detail Registration",
 					"event": [
 						{
 							"listen": "test",
@@ -2744,6 +2744,68 @@
 					"response": []
 				},
 				{
+					"name": "Get Detail Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 200 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"}); ",
+									"",
+									"pm.test('response body should an object', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.be.an('object');",
+									"});",
+									"",
+									"pm.test('response body have correct property and value', () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson).to.have.property('registration').to.be.an('string')",
+									"    pm.expect(responseJson).to.have.property('payment_method').to.be.an('string')",
+									"    pm.expect(responseJson).to.have.property('payment_status').to.be.an('string')",
+									"    pm.expect(responseJson).to.have.property('amount_paid').to.be.an('string')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenSuperUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/payments/{{paymentId}}",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"payments",
+								"{{paymentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "[Admin/Superuser] Edit Payments with Valid Data",
 					"event": [
 						{
@@ -2884,54 +2946,6 @@
 				}
 			],
 			"description": "Endpoint Payments:\n\n- **General User Access:  \n    POST** /payments dan **GET** /payments/{id}\n- **Admin/Superuser Access:  \n    GET, PUT,** dan **DELETE** /payments/{id}"
-		},
-		{
-			"name": "[No test] Cleaning resources",
-			"item": [
-				{
-					"name": "[Superuser] Delete Groups",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{accessTokenSuperUser}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://{{host}}:{{port}}/api/groups/{{groupId}}/",
-							"protocol": "http",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"groups",
-								"{{groupId}}",
-								""
-							]
-						}
-					},
-					"response": []
-				}
-			]
 		},
 		{
 			"name": "[Optional] Events",
@@ -3805,6 +3819,336 @@
 								"api",
 								"events",
 								"{{otherEventId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "[Mandatory] Upload Poster Event",
+			"item": [
+				{
+					"name": "Upload Event Poster",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 201 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"}); ",
+									"",
+									"pm.test('response body should be an object', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.be.an('object');",
+									"});",
+									"",
+									"pm.test('response body should have correct property types and non-empty ID', () => {",
+									"    const responseJson = pm.response.json();",
+									"    ",
+									"    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;",
+									"    pm.expect(responseJson).to.have.property('image').that.is.a('string')",
+									"",
+									"    pm.environment.set('fileName', responseJson.image);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenSuperUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/home/aras/Downloads/6298845955545483427.jpg"
+								},
+								{
+									"key": "event",
+									"value": "{{eventId}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/events/upload/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"events",
+								"upload",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Event Poster with Non Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 400 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(400);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"}); ",
+									"",
+									"pm.test('response body should an object', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenSuperUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "event",
+									"value": "{{eventId}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/events/upload/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"events",
+								"upload",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Event Poster with Large Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 400 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(400);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"}); ",
+									"",
+									"pm.test('response body should an object', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenSuperUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/home/aras/Downloads/picture-large.jpg"
+								},
+								{
+									"key": "event",
+									"value": "{{eventId}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/events/upload/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"events",
+								"upload",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event Poster",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 200 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"}); ",
+									"",
+									"pm.test('response body should an object', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('response body should have at least 1 item', () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.be.at.least(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/events/{{eventId}}/poster/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"events",
+								"{{eventId}}",
+								"poster",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "[No test] Cleaning resources",
+			"item": [
+				{
+					"name": "[Superuser] Delete Groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenSuperUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/groups/{{groupId}}/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"groups",
+								"{{groupId}}",
 								""
 							]
 						}
