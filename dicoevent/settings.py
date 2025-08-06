@@ -161,3 +161,10 @@ STORAGES = {
 }
 
 MAX_IMAGE_SIZE = 500 * 1024
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_HOST"),
+    }
+}

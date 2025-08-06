@@ -1,5 +1,6 @@
 import tempfile
 
+from django.core.cache import cache
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -10,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from core.permissions import IsOwnerOrAdminOrSuperUser, IsAdminOrSuperUser
-from events.models import Event, EventPoster
+from events.models import Event
 from events.serializers import EventSerializer, EventPosterSerializer
 
 from minio import Minio
@@ -25,6 +26,8 @@ def get_minio_client():
     )
 
 bucket_name = os.getenv('MINIO_BUCKET_NAME')
+CACHE_KEY_LIST = "event_list"
+CACHE_KEY_DETAIL = "event_detail_{}"
 
 class EventListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -35,18 +38,41 @@ class EventListCreateView(APIView):
         return [IsAuthenticated()]
 
     def get(self, request):
-        events = Event.objects.all().order_by('name')[:10]
-        serializer = EventSerializer(events, many=True)
-        return Response({'events': serializer.data})
+
+        events = cache.get(CACHE_KEY_LIST)
+
+        if not events:
+            print("Data diambil dari database")
+            events = Event.objects.all().order_by('name')[:10]
+            cache.get(CACHE_KEY_LIST)
+            serializer = EventSerializer(events, many=True)
+
+            # events_data = json.dumps(serializer.data)
+            events_data = serializer.data
+
+            cache.set(CACHE_KEY_LIST, events_data, timeout=3600)
+
+            events = events_data
+            data_source = "database"
+        else:
+            print("Data diambil dari cache")
+            data_source = "cache"
+
+        # response = Response({"events": json.loads(events)})
+        response = Response({"events": events})
+        response["X-Data-Source"] = data_source
+        return response
 
     def post(self, request):
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.delete(CACHE_KEY_LIST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventDetailView(APIView):
+
     def get_object(self, pk):
         try:
             event = Event.objects.get(pk=pk)
@@ -63,21 +89,39 @@ class EventDetailView(APIView):
         return [IsAuthenticated()]
 
     def get(self, request, pk):
-        event = self.get_object(pk)
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        cache_key = CACHE_KEY_DETAIL.format(pk)
+        event_data = cache.get(cache_key)
+
+        if not event_data:
+            print(f"Event {pk} diambil dari database")
+            event = self.get_object(pk)
+            serializer = EventSerializer(event)
+            event_data = serializer.data
+            cache.set(cache_key, event_data, timeout=3600)
+            data_source = "database"
+        else:
+            print(f"Event {pk} diambil dari cache")
+            data_source = "cache"
+
+        response = Response(event_data)
+        response["X-Data-Source"] = data_source
+        return response
 
     def put(self, request, pk):
         event = self.get_object(pk)
         serializer = EventSerializer(event, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.delete(CACHE_KEY_LIST)
+            cache.delete(CACHE_KEY_DETAIL.format(pk))
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         event = self.get_object(pk)
         event.delete()
+        cache.delete(CACHE_KEY_LIST)
+        cache.delete(CACHE_KEY_DETAIL.format(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class EventPosterView(APIView):
