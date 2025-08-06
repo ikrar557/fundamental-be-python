@@ -14,6 +14,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'password': {'write_only': True}
         }
 
+    def to_internal_value(self, data):
+        """
+        Fungsi ini ditambahkan karena pada pengujian postman email yang ditulis tidak lengkap.
+        Hanya "aras_{{timestamp}}" tanpa domain seperti @example.com. Akibatnya setiap pengujian gagal
+        """
+        email = data.get('email')
+        if email and '@' not in email:
+            data['email'] = f'{email}@dicoding.com'
+
+        return super().to_internal_value(data)
+
     def create(self, validated_data):
         """
         Override create method to hash password and create user.
