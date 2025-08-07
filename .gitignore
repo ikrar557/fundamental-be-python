@@ -12,3 +12,4 @@ payments/migrations/__pycache__
 core/__pycache__
 core/migrations/__pycache__
 submission_criteria.md
+logs/*
