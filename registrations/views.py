@@ -57,15 +57,7 @@ class RegistrationListCreateView(APIView):
             cache.delete(CACHE_KEY_LIST)
             print("Sending email via celery...")
 
-            # TODO: Hapus jika collection sudah ditambahkan email
-            user = registration.user_id
-            if not user.email:
-                random_email = f"test_{uuid.uuid4().hex[:6]}@mailtrap.io"
-                user.email = random_email
-                user.save()
-                print(f"Email user kosong, diisi sementara dengan: {random_email}")
-
-            send_ticket_email.delay(user.email, user.username, registration.id)
+            send_ticket_email.delay(registration.user_id.email, registration.user_id.username, registration.id)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

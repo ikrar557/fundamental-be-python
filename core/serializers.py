@@ -33,18 +33,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         validated_data['password'] = make_password(password)
         return User.objects.create(**validated_data)
 
-    # TODO: Add password validation if the postman collection update
-    def to_internal_value(self, data):
-        """
-        Fungsi ini ditambahkan karena pada pengujian postman email yang ditulis tidak lengkap.
-        Hanya "aras_{{timestamp}}" tanpa domain seperti @example.com. Akibatnya setiap pengujian gagal
-        """
-        email = data.get('email')
-        if email and '@' not in email:
-            data['email'] = f'{email}@dicoding.com'
-
-        return super().to_internal_value(data)
-
     def get__links(self, obj):
         request = self.context.get('request')
         return [
