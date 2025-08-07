@@ -12,6 +12,7 @@ djangorestframework-simplejwt = "*"
 minio = "*"
 pillow = "*"
 redis = "*"
+celery = "*"
 
 [dev-packages]
 

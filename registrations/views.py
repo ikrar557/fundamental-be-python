@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.cache import cache
 from django.http import Http404
 from rest_framework import status
@@ -6,9 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from core.permissions import IsOwnerOrAdminOrSuperUser
+import registrations
+from core.permissions import IsAdminOrSuperUser
 from registrations.models import Registration
 from registrations.serializers import RegistrationSerializer
+
+from .tasks import send_ticket_email
 
 CACHE_KEY_LIST = "registration_list"
 CACHE_KEY_DETAIL = "registration_detail_{}"
@@ -18,7 +23,7 @@ class RegistrationListCreateView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticated(), IsOwnerOrAdminOrSuperUser()]
+            return [IsAuthenticated(), IsAdminOrSuperUser()]
         return [IsAuthenticated()]
 
     def get(self, request):
@@ -27,7 +32,7 @@ class RegistrationListCreateView(APIView):
 
         if not registrations:
             print("Data diambil dari database")
-            registrations = Registration.objects.all()
+            registrations = Registration.objects.all().order_by('id')[:10]
             cache.get(CACHE_KEY_LIST)
             serializer = RegistrationSerializer(registrations, many=True)
 
@@ -48,8 +53,20 @@ class RegistrationListCreateView(APIView):
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            registration = serializer.save()
             cache.delete(CACHE_KEY_LIST)
+            print("Sending email via celery...")
+
+            # TODO: Hapus jika collection sudah ditambahkan email
+            user = registration.user_id
+            if not user.email:
+                random_email = f"test_{uuid.uuid4().hex[:6]}@mailtrap.io"
+                user.email = random_email
+                user.save()
+                print(f"Email user kosong, diisi sementara dengan: {random_email}")
+
+            send_ticket_email.delay(user.email, user.username, registration.id)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
