@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b608a06b-6491-40ee-a3e7-1c484db495bc",
+		"_postman_id": "98da180d-5f67-41b2-8313-b71677e3198e",
 		"name": "[788] DicoEvent versi 2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7447411"
@@ -10,7 +10,7 @@
 			"name": "[Mandatory] Users",
 			"item": [
 				{
-					"name": "Login Super User with Valid Data",
+					"name": "Log in as a Super User With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -122,7 +122,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"aras_{{$timestamp}}@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -146,7 +146,7 @@
 					"response": []
 				},
 				{
-					"name": "Login User with Valid Data",
+					"name": "Log In As a User With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -268,7 +268,24 @@
 					"response": []
 				},
 				{
-					"name": "User Access Get All Users",
+					"name": "[User] Try Access Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 403 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(403);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -363,7 +380,7 @@
 					"response": []
 				},
 				{
-					"name": "Edit Users with Valid Data",
+					"name": "Edit Users With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -542,7 +559,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"email_{{$timestamp}}@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -566,7 +583,7 @@
 					"response": []
 				},
 				{
-					"name": "Login User with Valid Data After Delete",
+					"name": "Log In As a User After Delete",
 					"event": [
 						{
 							"listen": "test",
@@ -825,7 +842,7 @@
 					"response": []
 				},
 				{
-					"name": "[Superuser] Edit Groups with Valid Data",
+					"name": "[Superuser] Edit Groups With Valid Data",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1048,7 +1065,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"admin@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1073,6 +1090,23 @@
 				},
 				{
 					"name": "[Superuser] Assign User to Role Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 201 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1112,7 +1146,64 @@
 					"response": []
 				},
 				{
-					"name": "Login Admin with Valid Data",
+					"name": "[Admin] Try Assigning the User to the Admin Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('it should response 403 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(403);",
+									"});",
+									"",
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessTokenAdmin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"{{adminId}}\",\n    \"group_id\": \"{{groupId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/assign-roles/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"assign-roles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Log In As a Admin With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -1179,7 +1270,7 @@
 			"name": "[Mandatory] Events",
 			"item": [
 				{
-					"name": "[Admin/Superuser] Add New Events with Valid Data",
+					"name": "[Admin/Superuser] Add New Events With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -1234,7 +1325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+							"raw": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-08-08 16:32\",\n    \"end_time\": \"2025-08-08 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1383,79 +1474,10 @@
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Get Detail Event",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://{{host}}:{{port}}/api/events/{{eventId}}/",
-									"protocol": "http",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"events",
-										"{{eventId}}",
-										""
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Date",
-									"value": "Wed, 09 Jul 2025 02:17:44 GMT"
-								},
-								{
-									"key": "Server",
-									"value": "WSGIServer/0.2 CPython/3.10.12"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Vary",
-									"value": "Accept"
-								},
-								{
-									"key": "Allow",
-									"value": "GET, PUT, DELETE, HEAD, OPTIONS"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "DENY"
-								},
-								{
-									"key": "Content-Length",
-									"value": "997"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"id\": \"09ac2fd5-d2ff-4f63-a400-316b31dcc04f\",\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04T16:00:00Z\",\n    \"end_time\": \"2025-06-04T17:00:00Z\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"_links\": [\n        {\n            \"rel\": \"self\",\n            \"href\": \"/api/events/\",\n            \"action\": \"POST\",\n            \"types\": [\n                \"application/json\"\n            ]\n        },\n        {\n            \"rel\": \"self\",\n            \"href\": \"/api/events/09ac2fd5-d2ff-4f63-a400-316b31dcc04f/\",\n            \"action\": \"GET\",\n            \"types\": [\n                \"application/json\"\n            ]\n        },\n        {\n            \"rel\": \"self\",\n            \"href\": \"/api/events/09ac2fd5-d2ff-4f63-a400-316b31dcc04f/\",\n            \"action\": \"PUT\",\n            \"types\": [\n                \"application/json\"\n            ]\n        },\n        {\n            \"rel\": \"self\",\n            \"href\": \"/api/events/09ac2fd5-d2ff-4f63-a400-316b31dcc04f/\",\n            \"action\": \"DELETE\",\n            \"types\": [\n                \"application/json\"\n            ]\n        }\n    ]\n}"
-						}
-					]
+					"response": []
 				},
 				{
-					"name": "[Admin/Superuser] Edit Events with Valid Data",
+					"name": "[Admin/Superuser] Edit Events With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -1511,7 +1533,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 250,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+							"raw": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-08-05 12:47\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 250,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1656,7 +1678,7 @@
 					]
 				},
 				{
-					"name": "[Admin/Organizer] Add New Tickets with Valid Data",
+					"name": "[Admin/Organizer] Add New Tickets With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -1856,7 +1878,7 @@
 					"response": []
 				},
 				{
-					"name": "[Admin/Superuser] Edit Tickets with Valid Data",
+					"name": "[Admin/Superuser] Edit Tickets With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -2110,7 +2132,7 @@
 					]
 				},
 				{
-					"name": "Add New Registrations with Valid Data",
+					"name": "Add New Registrations With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -2303,7 +2325,7 @@
 					"response": []
 				},
 				{
-					"name": "[Admin/Superuser] Edit Registrations with Valid Data",
+					"name": "[Admin/Superuser] Edit Registrations With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -2608,7 +2630,7 @@
 					]
 				},
 				{
-					"name": "Add New Payments with Valid Data",
+					"name": "Add New Payments With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -2806,7 +2828,7 @@
 					"response": []
 				},
 				{
-					"name": "[Admin/Superuser] Edit Payments with Valid Data",
+					"name": "[Admin/Superuser] Edit Payments With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -2951,7 +2973,7 @@
 			"name": "[Optional] Events",
 			"item": [
 				{
-					"name": "Get All Events with Pagination",
+					"name": "Get All Events With Pagination",
 					"event": [
 						{
 							"listen": "test",
@@ -3095,7 +3117,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"eo_dicoding\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"username\": \"eo_dicoding\",\n    \"password\": \"{{password}}\",\n    \"email\": \"eo_dicoding@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3140,7 +3162,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"other_organizer\",\n    \"password\": \"{{password}}\"\n}",
+							"raw": "{\n    \"username\": \"other_organizer\",\n    \"password\": \"{{password}}\",\n    \"email\": \"other@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3266,7 +3288,7 @@
 					"response": []
 				},
 				{
-					"name": "Login Organizer Dicoding",
+					"name": "Log In As a Organizer Dicoding",
 					"event": [
 						{
 							"listen": "test",
@@ -3328,7 +3350,7 @@
 					"response": []
 				},
 				{
-					"name": "Login Other Organizer",
+					"name": "Log In As a Other Organizer",
 					"event": [
 						{
 							"listen": "test",
@@ -3390,7 +3412,7 @@
 					"response": []
 				},
 				{
-					"name": "[Organizer] Add Own Event with Valid Data",
+					"name": "[Organizer] Add Own Event With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -3469,7 +3491,7 @@
 					"response": []
 				},
 				{
-					"name": "[Organizer] Add Other Event with Valid Data",
+					"name": "[Organizer] Add Other Event With Valid Data",
 					"event": [
 						{
 							"listen": "test",
@@ -3635,35 +3657,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('it should response 200 status code', () => {",
-									"    pm.expect(pm.response).to.have.status(200);",
+									"pm.test('it should response 403 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(403);",
 									"});",
 									"",
 									"pm.test('response Content-Type header should have application/json value', () => {",
 									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
-									"}); ",
-									"",
-									"pm.test('response body should be an object', () => {",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson).to.be.an('object');",
-									"});",
-									"",
-									"pm.test('when GET event details after update', () => {",
-									"    const eventId = pm.environment.get('otherEventId');",
-									"",
-									"    pm.sendRequest(`http://{{host}}:{{port}}/api/events/${eventId}/`, (error, response) => {",
-									"        if (!error) {",
-									"            pm.test('it should response with revised content', () => {",
-									"                pm.expect(response.code).to.equal(200);",
-									"",
-									"                const responseJson = response.json();",
-									"",
-									"                pm.expect(responseJson).to.be.an('object');",
-									"                pm.expect(responseJson.id).to.equal(eventId);",
-									"                pm.expect(responseJson.quota).to.equal(250);",
-									"            });",
-									"        }",
-									"    });",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3774,22 +3773,13 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('it should response 204 status code', () => {",
-									"    pm.expect(pm.response).to.have.status(204);",
+									"pm.test('it should response 403 status code', () => {",
+									"    pm.expect(pm.response).to.have.status(403);",
 									"});",
 									"",
-									"pm.test('when GET event details after delete', () => {",
-									"    const eventId = pm.environment.get('otherEventId');",
-									"",
-									"    pm.sendRequest(`http://{{host}}:{{port}}/api/movies/${eventId}`, (error, response) => {",
-									"        if (!error) {",
-									"            pm.test('it should response with 404 status code', () => {",
-									"                pm.expect(response.code).to.equal(404);",
-									"            });",
-									"        }",
-									"    });",
-									"});",
-									""
+									"pm.test('response Content-Type header should have application/json value', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -3910,7 +3900,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload Event Poster with Non Image",
+					"name": "Upload Event Poster With Non Image",
 					"event": [
 						{
 							"listen": "test",
@@ -3979,7 +3969,7 @@
 					"response": []
 				},
 				{
-					"name": "Upload Event Poster with Large Image",
+					"name": "Upload Event Poster With Large Image",
 					"event": [
 						{
 							"listen": "test",
