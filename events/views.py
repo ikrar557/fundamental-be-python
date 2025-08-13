@@ -71,6 +71,13 @@ class EventListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventDetailView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method in ("PUT", "PATCH", "DELETE"):
+            return [IsAuthenticated(), IsOwnerOrAdminOrSuperUser()]
+        return [IsAuthenticated()]
+
     def get_object(self, pk):
         try:
             event = Event.objects.get(pk=pk)
@@ -79,13 +86,6 @@ class EventDetailView(APIView):
         except Event.DoesNotExist:
             logger.warning("Event with pk={} not found, requested by {}", pk, self.request.user)
             raise Http404
-
-    authentication_classes = [JWTAuthentication]
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [IsAuthenticated()]
-        return [IsAuthenticated()]
 
     def get(self, request, pk):
         cache_key = CACHE_KEY_DETAIL.format(pk)
@@ -130,7 +130,7 @@ class EventPosterView(APIView):
     authentication_classes = [JWTAuthentication]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_permission(self):
+    def get_permissions(self):
         return [IsAuthenticated(), IsAdminOrSuperUser()]
 
     def post(self, request):

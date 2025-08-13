@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from core.permissions import IsAdminOrSuperUser, IsOwnerOrAdminOrSuperUser
+from core.permissions import IsAdminOrSuperUser, IsOwnerOrAdminOrSuperUser, IsSuperUser
 from .models import User
 from .serializers import UserSerializer, GroupSerializer
 from django.http import Http404
@@ -140,7 +140,7 @@ class GroupDetailView(APIView):
 
 class AssignRoleView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminOrSuperUser]
+    permission_classes = [IsSuperUser]
 
     def post(self, request):
         try:
@@ -154,7 +154,7 @@ class AssignRoleView(APIView):
 
             logger.info("POST /assign-role - User '{}' assigned to group '{}' by admin {}", user.username, group.name,
                         request.user)
-            return Response({"message": "Role assigned successfully"}, status=status.HTTP_200_OK)
+            return Response({"message": "Role assigned successfully"}, status=status.HTTP_201_CREATED)
 
         except KeyError as e:
             logger.error("POST /assign-role - Missing key {} in request data from admin {}", str(e), request.user)
